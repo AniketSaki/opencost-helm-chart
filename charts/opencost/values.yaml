@@ -10,7 +10,8 @@ serviceAccount:
   # -- Specifies whether a service account should be created
   create: true
   # --  Annotations to add to the service account
-  annotations: {}
+  annotations: 
+    eks.amazonaws.com/role-arn: arn:aws:iam::725876873105:role/dev-obsrv-internal-druid-raw-sa-iam-role
   # eks.amazonaws.com/role-arn: arn:aws:iam::123456789012:role/eksctl-opencost
   # The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
@@ -103,20 +104,22 @@ opencost:
       # runAsUser: 1000
 
     # Path of CSV file
-    csv_path: ""
+    csv_path: '/mnt/export/data.csv'
+    csv_labels_all: true
 
     # Persistent volume claim for storing the data. eg: csv file
     persistence:
-      enabled: false
+      enabled: true
       # -- Annotations for persistent volume
       annotations: {}
       # -- Access mode for persistent volume
-      accessMode: ""
+      accessMode: 'ReadWriteOnce'
       # -- Storage class for persistent volume
-      storageClass: ""
+      storageClass: 'gp2'
       # -- Size for persistent volume
-      size: ""
-
+      size: '1Gi'
+      reclaimPolicy: Retain
+      path: '/mnt/export'
     aws:
       # -- AWS secret access key
       secret_access_key: ""
@@ -133,11 +136,12 @@ opencost:
   metrics:
     serviceMonitor:
       # -- Create ServiceMonitor resource for scraping metrics using PrometheusOperator
-      enabled: false
+      enabled: true
       # -- Additional labels to add to the ServiceMonitor
-      additionalLabels: {}
+      additionalLabels: 
+        release: monitoring 
       # -- Specify if the ServiceMonitor will be deployed into a different namespace (blank deploys into same namespace as chart)
-      namespace: ""
+      namespace: monitoring
       # -- Interval at which metrics should be scraped
       scrapeInterval: 30s
       # -- HonorLabels chooses the metric's labels on collisions with target labels
@@ -170,9 +174,9 @@ opencost:
       # -- Use in-cluster Prometheus
       enabled: true
       # -- Service name of in-cluster Prometheus
-      serviceName: my-prometheus
+      serviceName: monitoring-kube-prometheus-prometheus
       # -- Namespace of in-cluster Prometheus
-      namespaceName: opencost
+      namespaceName: monitoring
       # -- Service port of in-cluster Prometheus
       port: 9090
     thanos:

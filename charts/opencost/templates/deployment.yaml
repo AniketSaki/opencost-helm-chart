@@ -125,6 +125,8 @@ spec:
             {{- if and .Values.opencost.exporter.persistence.enabled .Values.opencost.exporter.csv_path }}
             - name: EXPORT_CSV_FILE
               value: {{ .Values.opencost.exporter.csv_path | quote }}
+            - name: EXPORT_CSV_LABELS_ALL 
+              value: {{ .Values.opencost.exporter.csv_labels_all | quote }}
             {{- end }}
             {{- if .Values.opencost.prometheus.thanos.enabled }}
             - name: THANOS_ENABLED
